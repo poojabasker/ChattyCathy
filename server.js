@@ -18,7 +18,7 @@ app.use(express.json())
 //using a static file, entire directory instead of separate file
 app.use(express.static(__dirname))
 
-var dburl = 'mongodb+srv://pbuser:123@cluster1.i5ksw.mongodb.net/ChattyCathy?retryWrites=true&w=majority'
+var dburl = 'mongodb+srv://<username>:<password>@cluster1.i5ksw.mongodb.net/<dbname>?retryWrites=true&w=majority'
 
 var Message = mongoose.model('Message', {
     name : String,
