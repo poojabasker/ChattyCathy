@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF8">
+        <title>ChattyCathy!</title>
+        <link rel="icon" type="image/jpg" href='icon.png'/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"node></script>
+        <style>
+        body{
+            background-color: black;
+        }
+        #name{
+            margin-bottom: 15px;
+        }
+        #messagebox{
+            height : 275px;
+        }
+        #messagebox::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        #messagebox::-webkit-scrollbar-track {
+            background: rgb(179, 177, 177);
+            border-radius: 10px;
+        }
+        #messagebox::-webkit-scrollbar-thumb {
+            background: rgb(136, 136, 136);
+            border-radius: 10px;
+        }
+        #messagebox::-webkit-scrollbar-thumb:hover {
+            background: rgb(100, 100, 100);
+            border-radius: 10px;
+        }
+        #messagebox::-webkit-scrollbar-thumb:active {
+            background: rgb(68, 68, 68);
+            border-radius: 10px;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class='container'>
+            <br>
+            <div class="alert alert-info">
+                <h1 class='display-6'>Hello! Welcome to ChattyCathy!</h1>
+                <br>
+                <input id = 'name' class='form-control' placeholder='What should we call you?'>
+                <textarea id = 'content' class='form-control' placeholder='Type your message here...'></textarea>
+                <br>
+                <button id="send" class='btn btn-success'>Send</button>
+            </div>
+            <div id = 'messagebox' class="alert alert-primary overflow-auto">
+                <div id='messages'></div>
+            </div>
+        </div>
+        <div id='modal-insert'></div>
+        <script>
+            var socket = io() //socket variable initialized
+            $('#modal-insert').load('modal.html')
+            //equivalent to document.ready()
+           $(() => {
+               console.log('Page fully loaded!') //check on browser
+               $('#send').click(() => { //jquery
+                if($("#name").val()=='' || $("#content").val()=='')
+                    $('#modal').modal('show')
+                else{
+                    var message = {name : $("#name").val(), content : $("#content").val()}
+                    console.log(message)
+                    postMessage(message)
+                    $('#content').val('')
+                }
+               })
+               getMessages()
+           })
+
+           socket.on('message',addMessage)
+
+           function addMessage(message){
+               //#messages - gets the message id
+               //get the message name and the content and append it to that id
+               //`back-tick : js template literal instead of many quotes 
+
+               /*var msg = document.getElementById('messages'); //js
+               msg.innerHTML="<h4>"+message.name+"</h4><p>"+message.content+"</p>" //js */
+
+               $('#messages').append(`<h4>${message.name}</h4><p>${message.content}</p>`) //using jquery
+            }
+
+            function getMessages(){
+                $.get('http://localhost:3000/messages', (data)=>{
+                    data.forEach(addMessage)
+                })
+            }
+
+            function postMessage(message){
+                //console.log("Posting")
+                $.post('http://localhost:3000/messages', message)
+            }
+        </script>
+    </body>
+</html>
